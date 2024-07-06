@@ -5,10 +5,16 @@
  */
 package com.rasmijati.model;
 
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 /**
  *
@@ -22,16 +28,24 @@ public class User {
     private Long id;
     private String username;
     private String password;
-    private String role;
 
-    public User() {
-    }
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
 
-    public User(Long id, String username, String password, String role) {
+    public User(Long id, String username, String password, Set<Role> roles) {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.roles = roles;
+    }
+
+    public User(User user) {
+
     }
 
     public Long getId() {
@@ -58,12 +72,12 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public Set<Role> getRole() {
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole(Set<Role> roles) {
+        this.roles = roles;
     }
 
 }

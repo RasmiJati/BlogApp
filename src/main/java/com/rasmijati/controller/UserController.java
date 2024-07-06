@@ -1,27 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.rasmijati.controller;
 
 import com.rasmijati.model.User;
+import com.rasmijati.services.CustomUserDetailService;
 import com.rasmijati.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-/**
- *
- * @author admin
- */
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CustomUserDetailService userDetailsService;
 
     @GetMapping("/users")
     public List<User> getAllUsers() {
@@ -50,5 +49,20 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<User> registerUser(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.ok(createdUser);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody User loginUser) {
+        // Authenticate user using Spring Security AuthenticationManager (not shown here)
+        // For simplicity, assuming login is successful and return a dummy token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok("Login successful for user: " + userDetails.getUsername());
     }
 }
